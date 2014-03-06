@@ -2,7 +2,12 @@ package info.eurisko.core.repository;
 
 import info.eurisko.core.domain.Newsletter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class NewslettersMemoryRepository implements NewslettersRepository {
 
@@ -15,18 +20,16 @@ public class NewslettersMemoryRepository implements NewslettersRepository {
 	}
 
 	@Override
-	public synchronized Newsletter persist(Newsletter newsletter) {
+	public synchronized void persist(final Newsletter newsletter) {
 		newsletter.setKey(UUID.randomUUID());
 
-		Map<UUID, Newsletter> modifiableNewsletters = new HashMap<UUID, Newsletter>(newsletters);
+		final Map<UUID, Newsletter> modifiableNewsletters = new HashMap<UUID, Newsletter>(newsletters);
 		modifiableNewsletters.put(newsletter.getKey(), newsletter);
 		this.newsletters = Collections.unmodifiableMap(modifiableNewsletters);
-
-		return newsletter;
 	}
 
 	@Override
-	public Newsletter find(UUID key) {
+	public Newsletter find(final UUID key) {
 		return newsletters.get(key);
 	}
 

@@ -12,7 +12,7 @@ public class NewsletterDetailsEvent extends ReadEvent {
 		this.key = key;
 	}
 
-	public NewsletterDetailsEvent(UUID key, NewsletterDetails newsletterDetails) {
+	public NewsletterDetailsEvent(final UUID key, final NewsletterDetails newsletterDetails) {
 		this.key = key;
 		this.newsletterDetails = newsletterDetails;
 	}
@@ -25,8 +25,8 @@ public class NewsletterDetailsEvent extends ReadEvent {
 		return newsletterDetails;
 	}
 
-	public static NewsletterDetailsEvent notFound(UUID key) {
-		NewsletterDetailsEvent ev = new NewsletterDetailsEvent(key);
+	public static NewsletterDetailsEvent notFound(final UUID key) {
+		final NewsletterDetailsEvent ev = new NewsletterDetailsEvent(key);
 		ev.entityFound = false;
 		return ev;
 	}

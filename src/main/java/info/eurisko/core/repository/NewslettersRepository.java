@@ -5,12 +5,11 @@ import info.eurisko.core.domain.Newsletter;
 import java.util.Collection;
 import java.util.UUID;
 
-//TODO, make this event based again, with persistence integration events.
+//TODO make this event based again, with persistence integration events.
 public interface NewslettersRepository {
+	void persist(final Newsletter newsletter);
 
-	Newsletter persist(Newsletter newsletter);
-
-	Newsletter find(UUID key);
+	Newsletter find(final UUID key);
 
 	Collection<Newsletter> findAll();
 }

@@ -6,30 +6,27 @@ import info.eurisko.core.repository.NewslettersRepository;
 import info.eurisko.core.services.NewsletterEventHandler;
 import info.eurisko.core.services.NewsletterService;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
 import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
-import org.springframework.orm.jpa.vendor.Database;
 
 @Configuration
 @ComponentScan(basePackages = "com.yummynoodlebar", excludeFilters = { @ComponentScan.Filter(Configuration.class) })
@@ -38,7 +35,7 @@ import org.springframework.orm.jpa.vendor.Database;
 public class CoreConfig {
 
 	@Bean
-	public NewsletterService createService(NewslettersRepository repo) {
+	public NewsletterService createService(final NewslettersRepository repo) {
 		return new NewsletterEventHandler(repo);
 	}
 
@@ -67,11 +64,6 @@ public class CoreConfig {
 
 	@Bean(name="dataSource")
 	public DataSource dataSource() {
-		logger.warn("*** 1. Creating dataSource");
-
-		logger.warn("URL '{}'", dbUrl);
-		logger.warn("Driver '{}'", dbDriverClass);
-
 		final BasicDataSource bean = new BasicDataSource();
 
 		bean.setDriverClassName(dbDriverClass);
@@ -95,6 +87,7 @@ public class CoreConfig {
 		final LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
 		bean.setDataSource(dataSource());
 
+		// No need for persistence.xml - thanks to packagesToScan
 		logger.warn("Scanning Package '{}' for entities", Newsletter.class.getPackage().getName());
 		bean.setPackagesToScan(Newsletter.class.getPackage().getName());
 
@@ -105,7 +98,6 @@ public class CoreConfig {
 
 		bean.setJpaVendorAdapter(jpaVendorAdapter);
 
-		// No persistence.xml - thanks to packagesToScan
 		return bean;
 	}
 
@@ -139,5 +131,4 @@ public class CoreConfig {
 			}
 		}
 	}
-
 }

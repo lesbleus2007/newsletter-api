@@ -8,22 +8,22 @@ import java.util.UUID;
 
 public class NewslettersFixtures {
 
-  public static final String YUMMY_ITEM = "yummy_core";
+	public static final String YUMMY_ITEM = "yummy_core";
 
-  public static Newsletter standardNewsletter() {
-    Newsletter newsletter = new Newsletter();
+	public static Newsletter standardNewsletter() {
+		final Newsletter newsletter = new Newsletter();
 
-	newsletter.setKey(UUID.randomUUID());
-    newsletter.setDateTimeOfSubmission(new Date());
+		newsletter.setKey(UUID.randomUUID());
+		newsletter.setDateTimeOfSubmission(new Date());
 
-    return newsletter;
-  }
+		return newsletter;
+	}
 
-  /*
-   * Twin of the above, to improve readability
-   */
-  public static NewsletterDetails standardNewsletterDetails() {
-    return standardNewsletter().toNewsletterDetails();
-  }
+	/**
+	 * Twin of the above, to improve readability
+	 */
+	public static NewsletterDetails standardNewsletterDetails() {
+		return standardNewsletter().toNewsletterDetails();
+	}
 
 }

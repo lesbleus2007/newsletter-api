@@ -1,21 +1,16 @@
 package info.eurisko.rest.domain;
 
-// {!begin import}
-import org.springframework.hateoas.ResourceSupport;
-
-
-// {!end import}
-
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import info.eurisko.core.events.newsletters.NewsletterDetails;
-import info.eurisko.rest.controller.*;
-
-import javax.xml.bind.annotation.XmlRootElement;
+import info.eurisko.rest.controller.NewsletterQueriesController;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.springframework.hateoas.ResourceSupport;
 
 /**
  * This is added so that we can do jaxb serialisation.
@@ -23,10 +18,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
  */
 @SuppressWarnings("serial")
 @XmlRootElement
-// {!begin resourceSupport}
 public class Newsletter extends ResourceSupport implements Serializable {
-	// {!end resourceSupport}
-
 	private Date dateTimeOfSubmission;
 
 	private UUID key;
@@ -39,7 +31,7 @@ public class Newsletter extends ResourceSupport implements Serializable {
 		return key;
 	}
 
-	public void setDateTimeOfSubmission(Date dateTimeOfSubmission) {
+	public void setDateTimeOfSubmission(final Date dateTimeOfSubmission) {
 		this.dateTimeOfSubmission = dateTimeOfSubmission;
 	}
 
@@ -48,7 +40,7 @@ public class Newsletter extends ResourceSupport implements Serializable {
 	}
 
 	public NewsletterDetails toNewsletterDetails() {
-		NewsletterDetails details = new NewsletterDetails();
+		final NewsletterDetails details = new NewsletterDetails();
 
 		details.setKey(key);
 		details.setDateTimeOfSubmission(dateTimeOfSubmission);
@@ -56,9 +48,8 @@ public class Newsletter extends ResourceSupport implements Serializable {
 		return details;
 	}
 
-	// {!begin fromNewsletterDetails}
-	public static Newsletter fromNewsletterDetails(NewsletterDetails newsletterDetails) {
-		Newsletter newsletter = new Newsletter();
+	public static Newsletter fromNewsletterDetails(final NewsletterDetails newsletterDetails) {
+		final Newsletter newsletter = new Newsletter();
 
 		newsletter.dateTimeOfSubmission = newsletterDetails.getDateTimeOfSubmission();
 		newsletter.key = newsletterDetails.getKey();
@@ -68,11 +59,8 @@ public class Newsletter extends ResourceSupport implements Serializable {
 
 		// Much of the rest of the framework is helping deal with the blending of domains that happens in many spring apps.
 		// We have explicitly avoided that.
-		// {!begin selfRel}
 		newsletter.add(linkTo(NewsletterQueriesController.class).slash(newsletter.key).withSelfRel());
-		// {!end selfRel}
 
 		return newsletter;
 	}
-	// {!end fromNewsletterDetails}
 }

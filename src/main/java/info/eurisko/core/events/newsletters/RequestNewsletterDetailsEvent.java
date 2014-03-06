@@ -7,7 +7,7 @@ import java.util.UUID;
 public class RequestNewsletterDetailsEvent extends RequestReadEvent {
 	private UUID key;
 
-	public RequestNewsletterDetailsEvent(UUID key) {
+	public RequestNewsletterDetailsEvent(final UUID key) {
 		this.key = key;
 	}
 

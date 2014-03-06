@@ -1,59 +1,58 @@
 package info.eurisko.core.services;
 
-import org.junit.Before;
-import org.junit.Test;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import info.eurisko.core.domain.Newsletter;
-import info.eurisko.core.events.newsletters.*;
+import info.eurisko.core.events.newsletters.CreateNewsletterEvent;
+import info.eurisko.core.events.newsletters.NewsletterDetails;
 import info.eurisko.core.repository.NewslettersMemoryRepository;
-import info.eurisko.core.services.NewsletterEventHandler;
 
 import java.util.Date;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import org.junit.Before;
+import org.junit.Test;
 
 public class NewsletterEventHandlerUnitTest {
+	private NewsletterEventHandler uut;
+	private NewslettersMemoryRepository mockNewslettersMemoryRepository;
 
-  NewsletterEventHandler uut;
-  NewslettersMemoryRepository mockNewslettersMemoryRepository;
+	@Before
+	public void setupUnitUnderTest() {
+		mockNewslettersMemoryRepository = mock(NewslettersMemoryRepository.class);
+		uut = new NewsletterEventHandler(mockNewslettersMemoryRepository);
+	}
 
-  @Before
-  public void setupUnitUnderTest() {
-    mockNewslettersMemoryRepository = mock(NewslettersMemoryRepository.class);
-    uut = new NewsletterEventHandler(mockNewslettersMemoryRepository);
-  }
+	@Test
+	public void addANewNewsletterToTheSystem() {
+		final Newsletter newsletter = new Newsletter();
+		newsletter.setKey(UUID.randomUUID());
+		newsletter.setDateTimeOfSubmission(new Date());
 
-  @Test
-  public void addANewNewsletterToTheSystem() {
-	Newsletter newsletter = new Newsletter();
-	newsletter.setKey(UUID.randomUUID());
-    newsletter.setDateTimeOfSubmission(new Date());
+		CreateNewsletterEvent ev = new CreateNewsletterEvent(new NewsletterDetails());
 
-    when(mockNewslettersMemoryRepository.persist(any(Newsletter.class))).thenReturn(newsletter);
+		uut.createNewsletter(ev);
 
-    CreateNewsletterEvent ev = new CreateNewsletterEvent(new NewsletterDetails());
+		verify(mockNewslettersMemoryRepository).persist(any(Newsletter.class));
+		verifyNoMoreInteractions(mockNewslettersMemoryRepository);
+	}
 
-    uut.createNewsletter(ev);
+	@Test
+	public void addTwoNewNewslettersToTheSystem() {
+		final Newsletter newsletter = new Newsletter();
+		newsletter.setKey(UUID.randomUUID());
+		newsletter.setDateTimeOfSubmission(new Date());
 
-    verify(mockNewslettersMemoryRepository).persist(any(Newsletter.class));
-    verifyNoMoreInteractions(mockNewslettersMemoryRepository);
-  }
+		CreateNewsletterEvent ev = new CreateNewsletterEvent(new NewsletterDetails());
 
-  @Test
-  public void addTwoNewNewslettersToTheSystem() {
-	Newsletter newsletter = new Newsletter();
-	newsletter.setKey(UUID.randomUUID());
-    newsletter.setDateTimeOfSubmission(new Date());
+		uut.createNewsletter(ev);
+		uut.createNewsletter(ev);
 
-    when(mockNewslettersMemoryRepository.persist(any(Newsletter.class))).thenReturn(newsletter);
-
-    CreateNewsletterEvent ev = new CreateNewsletterEvent(new NewsletterDetails());
-
-    uut.createNewsletter(ev);
-    uut.createNewsletter(ev);
-
-    verify(mockNewslettersMemoryRepository, times(2)).persist(any(Newsletter.class));
-    verifyNoMoreInteractions(mockNewslettersMemoryRepository);
-  }
+		verify(mockNewslettersMemoryRepository, times(2))
+			.persist(any(Newsletter.class));
+		verifyNoMoreInteractions(mockNewslettersMemoryRepository);
+	}
 }

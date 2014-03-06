@@ -1,86 +1,86 @@
 package info.eurisko.rest.functional;
 
-import org.junit.Test;
-import org.springframework.http.*;
-import org.springframework.security.crypto.codec.Base64;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 import info.eurisko.rest.controller.fixture.RestDataFixture;
 import info.eurisko.rest.domain.Newsletter;
 
 import java.util.Arrays;
 
-import static junit.framework.TestCase.*;
+import org.junit.Test;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.codec.Base64;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 public class NewsletterTests {
+	@Test
+	public void thatNewslettersCanBeAddedAndQueried() {
+		final ResponseEntity<Newsletter> entity = createNewsletter();
 
-  @Test
-  public void thatNewslettersCanBeAddedAndQueried() {
+		final String path = entity.getHeaders().getLocation().getPath();
 
-    ResponseEntity<Newsletter> entity = createNewsletter();
+		assertEquals(HttpStatus.CREATED, entity.getStatusCode());
+		assertTrue(path.startsWith("/aggregators/newsletters/"));
+		final Newsletter newsletter = entity.getBody();
 
-    String path = entity.getHeaders().getLocation().getPath();
+		System.out.println("The Newsletter ID is " + newsletter.getKey());
+		System.out.println("The Location is " + entity.getHeaders().getLocation());
+	}
 
-    assertEquals(HttpStatus.CREATED, entity.getStatusCode());
-    assertTrue(path.startsWith("/aggregators/newsletters/"));
-    Newsletter newsletter = entity.getBody();
+	@Test
+	public void thatNewslettersCannotBeAddedAndQueriedWithBadUser() {
+		final HttpEntity<String> requestEntity = new HttpEntity<String>(
+				RestDataFixture.standardNewsletterJSON(),
+				getHeaders("letsnosh:BADPASSWORD"));
 
-    System.out.println ("The Newsletter ID is " + newsletter.getKey());
-    System.out.println ("The Location is " + entity.getHeaders().getLocation());
-  }
+		final RestTemplate template = new RestTemplate();
+		try {
+			final ResponseEntity<Newsletter> entity = template.postForEntity(
+					"http://localhost:8080/aggregators/newsletters",
+					requestEntity,
+					Newsletter.class);
 
-  @Test
-  public void thatNewslettersCannotBeAddedAndQueriedWithBadUser() {
+			fail("Request Passed incorrectly with status " + entity.getStatusCode());
+		} catch (final HttpClientErrorException ex) {
+			assertEquals(HttpStatus.UNAUTHORIZED, ex.getStatusCode());
+		}
+	}
 
-    HttpEntity<String> requestEntity = new HttpEntity<String>(
-        RestDataFixture.standardNewsletterJSON(),
-        getHeaders("letsnosh" + ":" + "BADPASSWORD"));
+	@Test
+	public void thatNewslettersHaveCorrectHateoasLinks() {
+		final ResponseEntity<Newsletter> entity = createNewsletter();
 
-    RestTemplate template = new RestTemplate();
-    try {
-      ResponseEntity<Newsletter> entity = template.postForEntity(
-          "http://localhost:8080/aggregators/newsletters",
-          requestEntity, Newsletter.class);
+		final Newsletter newsletter = entity.getBody();
 
-      fail("Request Passed incorrectly with status " + entity.getStatusCode());
-    } catch (HttpClientErrorException ex) {
-      assertEquals(HttpStatus.UNAUTHORIZED, ex.getStatusCode());
-    }
-  }
+		assertEquals(entity.getHeaders().getLocation().toString(), newsletter.getLink("self").getHref());
+	}
 
-  // {!begin thatNewslettersHaveCorrectHateoasLinks}
-  @Test
-  public void thatNewslettersHaveCorrectHateoasLinks() {
+	private ResponseEntity<Newsletter> createNewsletter() {
+		final HttpEntity<String> requestEntity = new HttpEntity<String>(
+				RestDataFixture.standardNewsletterJSON(),
+				getHeaders("letsnosh:noshing"));
 
-    ResponseEntity<Newsletter> entity = createNewsletter();
+		final RestTemplate template = new RestTemplate();
+		return template.postForEntity(
+				"http://localhost:8080/aggregators/newsletters",
+				requestEntity,
+				Newsletter.class);
+	}
 
-    Newsletter newsletter = entity.getBody();
+	static HttpHeaders getHeaders(final String auth) {
+		final HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
-    assertEquals(entity.getHeaders().getLocation().toString(), newsletter.getLink("self").getHref());
-  }
-  // {!end thatNewslettersHaveCorrectHateoasLinks}
+		final byte[] encodedAuthorisation = Base64.encode(auth.getBytes());
+		headers.add("Authorization", "Basic " + new String(encodedAuthorisation));
 
-  private ResponseEntity<Newsletter> createNewsletter() {
-    HttpEntity<String> requestEntity = new HttpEntity<String>(
-        RestDataFixture.standardNewsletterJSON(),getHeaders("letsnosh" + ":" + "noshing"));
-
-    RestTemplate template = new RestTemplate();
-    return template.postForEntity(
-        "http://localhost:8080/aggregators/newsletters",
-        requestEntity, Newsletter.class);
-  }
-
-  static HttpHeaders getHeaders(String auth) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
-    byte[] encodedAuthorisation = Base64.encode(auth.getBytes());
-    headers.add("Authorization", "Basic " + new String(encodedAuthorisation));
-
-    return headers;
-  }
+		return headers;
+	}
 }
-
-

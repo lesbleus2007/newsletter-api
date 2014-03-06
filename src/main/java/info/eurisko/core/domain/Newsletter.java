@@ -1,20 +1,19 @@
 package info.eurisko.core.domain;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
-import org.springframework.beans.BeanUtils;
-
 import info.eurisko.core.events.newsletters.NewsletterDetails;
 
-import java.util.*;
+import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlRootElement;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+import org.springframework.beans.BeanUtils;
 
 @Entity
-@XmlRootElement
 public class Newsletter {
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -31,7 +30,7 @@ public class Newsletter {
 		return key;
 	}
 
-	public void setKey(UUID key) {
+	public void setKey(final UUID key) {
 		this.key = key;
 	}
 
@@ -39,20 +38,20 @@ public class Newsletter {
 		return dateTimeOfSubmission;
 	}
 
-	public void setDateTimeOfSubmission(Date dateTimeOfSubmission) {
+	public void setDateTimeOfSubmission(final Date dateTimeOfSubmission) {
 		this.dateTimeOfSubmission = dateTimeOfSubmission;
 	}
 
 	public NewsletterDetails toNewsletterDetails() {
-		NewsletterDetails details = new NewsletterDetails();
+		final NewsletterDetails details = new NewsletterDetails();
 
 		BeanUtils.copyProperties(this, details);
 
 		return details;
 	}
 
-	public static Newsletter fromNewsletterDetails(NewsletterDetails newsletterDetails) {
-		Newsletter newsletter = new Newsletter();
+	public static Newsletter fromNewsletterDetails(final NewsletterDetails newsletterDetails) {
+		final Newsletter newsletter = new Newsletter();
 
 		BeanUtils.copyProperties(newsletterDetails, newsletter);
 

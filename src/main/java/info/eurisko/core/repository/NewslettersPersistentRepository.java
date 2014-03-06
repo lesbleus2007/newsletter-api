@@ -12,6 +12,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class NewslettersPersistentRepository implements NewslettersRepository {
 	@PersistenceContext
 	private EntityManager em;
@@ -22,18 +25,17 @@ public class NewslettersPersistentRepository implements NewslettersRepository {
 	}
 
 	@Override
-	public Newsletter persist(final Newsletter newsletter) {
+	public void persist(final Newsletter newsletter) {
 		em.persist(newsletter);
-		return newsletter;
 	}
 
 	@Override
 	public Collection<Newsletter> findAll() {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Newsletter> cq = cb.createQuery(Newsletter.class);
-		Root<Newsletter> pet = cq.from(Newsletter.class);
+		final CriteriaBuilder cb = em.getCriteriaBuilder();
+		final CriteriaQuery<Newsletter> cq = cb.createQuery(Newsletter.class);
+		final Root<Newsletter> pet = cq.from(Newsletter.class);
 		cq.select(pet);
-		TypedQuery<Newsletter> q = em.createQuery(cq);
+		final TypedQuery<Newsletter> q = em.createQuery(cq);
 		return q.getResultList();
 	}
 }

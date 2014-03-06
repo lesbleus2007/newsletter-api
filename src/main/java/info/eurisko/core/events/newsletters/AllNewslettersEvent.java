@@ -10,7 +10,7 @@ public class AllNewslettersEvent extends ReadEvent {
 
 	private final List<NewsletterDetails> newslettersDetails;
 
-	public AllNewslettersEvent(List<NewsletterDetails> newsletters) {
+	public AllNewslettersEvent(final List<NewsletterDetails> newsletters) {
 		this.newslettersDetails = Collections.unmodifiableList(newsletters);
 	}
 

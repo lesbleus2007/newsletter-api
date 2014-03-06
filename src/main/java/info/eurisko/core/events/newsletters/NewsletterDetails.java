@@ -12,7 +12,7 @@ public class NewsletterDetails {
 		key = null;
 	}
 
-	public NewsletterDetails(UUID key) {
+	public NewsletterDetails(final UUID key) {
 		this.key = key;
 	}
 
@@ -20,7 +20,7 @@ public class NewsletterDetails {
 		return this.dateTimeOfSubmission;
 	}
 
-	public void setDateTimeOfSubmission(Date dateTimeOfSubmission) {
+	public void setDateTimeOfSubmission(final Date dateTimeOfSubmission) {
 		this.dateTimeOfSubmission = dateTimeOfSubmission;
 	}
 
@@ -28,7 +28,7 @@ public class NewsletterDetails {
 		return key;
 	}
 
-	public void setKey(UUID key) {
+	public void setKey(final UUID key) {
 		this.key = key;
 	}
 }

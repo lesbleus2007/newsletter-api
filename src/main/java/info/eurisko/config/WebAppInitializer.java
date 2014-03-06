@@ -1,5 +1,11 @@
 package info.eurisko.config;
 
+import java.util.Set;
+
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.WebApplicationInitializer;
@@ -9,27 +15,21 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-
-import java.util.Set;
-
 public class WebAppInitializer implements WebApplicationInitializer {
 
 	private static Logger LOG = LoggerFactory.getLogger(WebAppInitializer.class);
 
 	@Override
-	public void onStartup(ServletContext servletContext) {
-		WebApplicationContext rootContext = createRootContext(servletContext);
+	public void onStartup(final ServletContext servletContext) {
+		final WebApplicationContext rootContext = createRootContext(servletContext);
 
 		configureSpringMvc(servletContext, rootContext);
 
 		configureSpringSecurity(servletContext, rootContext);
 	}
 
-	private WebApplicationContext createRootContext(ServletContext servletContext) {
-		AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
+	private WebApplicationContext createRootContext(final ServletContext servletContext) {
+		final AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
 		rootContext.register(CoreConfig.class, SecurityConfig.class);
 		rootContext.refresh();
 
@@ -39,8 +39,8 @@ public class WebAppInitializer implements WebApplicationInitializer {
 		return rootContext;
 	}
 
-	private void configureSpringMvc(ServletContext servletContext, WebApplicationContext rootContext) {
-		AnnotationConfigWebApplicationContext mvcContext = new AnnotationConfigWebApplicationContext();
+	private void configureSpringMvc(final ServletContext servletContext, final WebApplicationContext rootContext) {
+		final AnnotationConfigWebApplicationContext mvcContext = new AnnotationConfigWebApplicationContext();
 		mvcContext.register(MVCConfig.class);
 
 		mvcContext.setParent(rootContext);
@@ -57,8 +57,8 @@ public class WebAppInitializer implements WebApplicationInitializer {
 		}
 	}
 
-	private void configureSpringSecurity(ServletContext servletContext, WebApplicationContext rootContext) {
-		FilterRegistration.Dynamic springSecurity = servletContext.addFilter("springSecurityFilterChain",
+	private void configureSpringSecurity(final ServletContext servletContext, final WebApplicationContext rootContext) {
+		final FilterRegistration.Dynamic springSecurity = servletContext.addFilter("springSecurityFilterChain",
 				new DelegatingFilterProxy("springSecurityFilterChain", rootContext));
 		springSecurity.addMappingForUrlPatterns(null, true, "/*");
 	}
